@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
 body { background: #f0f2f5; direction: rtl; display: flex; min-height: 100vh; }
-
+/* itigi */
 /* Sidebar */
 .sidebar {
     width: 250px;
