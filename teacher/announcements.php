@@ -3,7 +3,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الإعلانات - مدرسة أسرتي القرآنية</title>
+    <title>الإعلانات  f- مدرسة أسرتي القرآنية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="teacher_style.css"> <style>
         :root { --main-green: #0d3c1a; --gold: #bfa15f; --bg-gray: #f8f9fa; }
