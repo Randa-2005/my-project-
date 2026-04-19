@@ -1,0 +1,889 @@
+/* 1. الإعدادات العامة والخلفية بنقوش */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Cairo', sans-serif !important; /* توحيد الخط في كامل الموقع */
+    direction: rtl;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+
+.sidebar {
+    width: 260px;
+    height: 100vh; 
+    background-color: #0d3c1a;
+    background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
+    background-blend-mode: multiply; 
+    
+    /* لتكرار النقش بشكل صحيح */
+    background-repeat: repeat;
+    background-size: 100px; 
+    position: fixed;
+    right: 0; /* يبدأ من اليمين */
+    top: 0;
+    color: white;
+    transition: all 0.4s ease;
+    z-index: 1000;
+    padding-top: 30px; /* المسافة فوق الأيقونة التي طلبتِها */
+}
+
+/* 2. تنسيق الهيدر (أيقونة الجرس والعنوان) */
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(191, 161, 95, 0.2);
+    padding-bottom: 15px;
+}
+
+.sidebar-header h3 {
+    color: #bfa15f !important;
+   font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 19px !important;
+    margin-top: 10px;
+}
+.sidebar-header i {
+    color: #bfa15f !important; /* اللون الذهبي المطلوب */
+    font-size: 55px !important; /* حجم أكبر وبارز كما في الصور */
+    display: block;
+    margin: 0 auto 15px;
+    text-align: center;
+    /* إضافة ظل خفيف ليبرز فوق النقوش */
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));}
+
+/* 3. زر إغلاق السايدبار (تصحيح السهم) */
+#close-sidebar.close-sidebar-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px; /* يبقى في اليسار داخل السايدبار */
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(191, 161, 95, 0.1) !important;
+    border-radius: 50% !important;
+    border: none !important;
+    color: #bfa15f !important;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+/* 4. تنسيق القائمة والإطار الذهبي (المنكمش للداخل) */
+.nav-links {
+    list-style: none;
+    padding: 0 15px !important; /* المسافة التي تمنع الالتصاق بالحواف */
+    margin-top: 10px;
+}
+
+.nav-links li {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 12px; /* حواف دائرية أنيقة */
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.nav-links li a {
+    color: white !important;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-links li i {
+    color: white !important; /* اللون الأبيض للأيقونات كما في الكود الخاص بك */
+    font-size: 18px; /* نفس الحجم المستخدم سابقاً */
+    margin-left: 10px; /* مسافة للأيقونة في الواجهة العربية */}
+
+/* حالة الزر النشط (Active Gold) */
+.nav-links li span {
+    color: white !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 15px;
+}
+h3, h2, h1 {
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 800 !important;
+}
+.nav-links li.active-gold {
+    background-color: #bfa15f !important; /* الخلفية الذهبية */
+}
+
+.nav-links li:hover {
+    background-color: rgba(191, 161, 95, 0.2);
+}
+
+/* 5. حالة القائمة المغلقة (الإخفاء التام لليسار) */
+.sidebar-closed .sidebar {
+    right: -280px !important; /* يختفي تماماً خارج الشاشة يميناً */
+    visibility: hidden;
+}
+
+.sidebar-closed .main-content {
+    margin-right: 0 !important;
+    width: 100% !important;
+}
+
+
+/* 6. المحتوى الرئيسي */
+.main-content {
+    margin-right: 260px; /* المسافة المحجوزة للسايدبار يميناً */
+    margin-left: 0;
+    width: calc(100% - 260px); /* العرض هو الشاشة كاملة ناقص عرض السايدبار */
+    transition: all 0.4s ease-in-out;
+    padding: 30px;
+    box-sizing: border-box; /* لضمان عدم خروج المحتوى بسبب الـ padding */
+    overflow-x: hidden;
+}
+/* شكل الرابط النشط */
+/* تنسيق الرابط عندما يكون نشطاً */
+/* تنسيق الرابط عندما يكون نشطاً (ثابت) */
+.sidebar-link.active {
+    background: rgba(191, 161, 95, 0.25) !important; /* ذهبي شفاف */
+    border: 1px solid #bfa15f !important; /* إطار ذهبي كامل */
+    border-right: 5px solid #bfa15f !important; /* إطار أيمن أسمك قليلاً للتميز */
+    color: #fff !important;
+    border-radius: 10px;
+    margin: 5px 10px;
+    font-weight: bold;
+}
+
+/* لضمان بقاء الأيقونة بيضاء أو ذهبية داخل الرابط النشط */
+.sidebar-link.active i {
+    color: #bfa15f !important;
+}
+/* صناديق الإحصائيات (Cards) */
+.stats-container {
+    display: flex !important;
+    justify-content: space-between;
+    flex-direction: row !important; /* إجبار العناصر على البقاء في صف واحد */
+    align-items: center;
+    gap: 10px; /* المسافة بين البطاقات */
+    width: 100%;
+    margin-bottom: 30px;
+    flex-wrap: nowrap !important; /* ممنوع النزول لسطر جديد مهما حدث */
+    overflow-x: auto; /* إضافة شريط تمرير إذا كانت الشاشة صغيرة جداً بدل النزول للأسفل */
+}
+
+.stat-card {
+    flex: 1; /* تجعل البطاقات تتقاسم المساحة بالتساوي */
+    min-width: 200px; /* العرض الأدنى لكل بطاقة لتبقى واضحة */
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-right: 5px solid #bfa15f; /* إضافة اللمسة الذهبية الجانبية */
+}
+/* تنسيق التوب بار (البحث واليوزر) */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.search-box {
+    background: #f1f1f1;
+    padding: 10px 20px;
+    border-radius: 30px;
+    width: 40%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-box input {
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
+}
+
+/* تنسيق صناديق الإحصائيات */
+.stat-card i {
+    font-size: 35px;
+    color: #bfa15f; /* اللون الذهبي */
+    opacity: 0.7;
+}
+
+.stat-info h3 {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.stat-info .number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a472a; /* اللون الأخضر */
+    margin: 5px 0 0 0;
+}
+
+/* تنسيق الجدول */
+.recent-activity {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    text-align: right;
+    padding: 12px;
+    background: #f8f9fa;
+    color: #1a472a;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.btn-print {
+    background: #bfa15f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.open-sidebar-btn {
+    display: none; 
+    background-color: #1a472a; /* الأخضر الظاهر في صورتك */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px; /* حواف دائرية خفيفة */
+    font-size: 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* يظهر الزر فقط عندما ينغلق السايدبار */
+.sidebar-closed .open-sidebar-btn {
+    display: inline-block;
+}
+
+/* تنسيق النافذة المنبثقة */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية */
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    width: 80%;
+    border-radius: 15px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: slideDown 0.4s ease;
+
+}
+
+.modal-header {
+    background: #1a472a; /* الأخضر الداكن */
+    color: #bfa15f; /* الذهبي */
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.confirm-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.confirm-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.requests-table th:first-child, 
+.requests-table td:first-child {
+    padding-right: 50px !important; /* لدفع عمود الأسماء بعيداً عن الحافة اليمنى */
+}
+.cairo-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+    background: #fff;
+    margin-top: 8px;
+    box-sizing: border-box;
+}
+
+.cairo-input:focus {
+    border-color: #bfa15f; /* يتحول للذهبي عند الكتابة */
+    box-shadow: 0 0 8px rgba(191, 161, 95, 0.2);
+}
+
+.input-group label {
+    font-weight: 700;
+    color: #1a472a;
+    display: block;
+}
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a472a;
+    font-family: 'Cairo', sans-serif;
+}
+
+.table-section {
+    overflow-x: auto; /* لمنع الجدول من الخروج عن الشاشة في الهواتف */
+}
+/* التعديل ليتناسب مع وجود الكلاس في الـ li */
+.nav-links li.active a {
+    background: rgba(191, 161, 95, 0.25) !important; /* ذهبي شفاف */
+    border: 1px solid #bfa15f !important; /* إطار ذهبي */
+    border-right: 5px solid #bfa15f !important; /* إطار أيمن سميك */
+    border-radius: 10px;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    margin: 5px 10px;
+    padding: 10px;
+}
+
+.nav-links li.active i {
+    color: #bfa15f !important; /* الأيقونة ذهبية */
+}
+/* تنسيق النموذج */
+.registration-form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    max-width: 800px;
+    margin: auto;
+}
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    color: #1a472a;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.input-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.input-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-field input, .input-field select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Cairo';
+}
+
+/* تنسيق مفتاح الدفع (Switch) */
+.payment-box {
+    background: #fdfaf3;
+    padding: 20px;
+    border-radius: 10px;
+    border-right: 5px solid #bfa15f;
+    margin: 25px 0;
+}
+
+.hidden-field { display: none; }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px; width: 16px;
+    left: 4px; bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider { background-color: #1a472a; }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* تنسيق النافذة المنبثقة (Modal) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    width: 80%; /* بدون علامات اقتباس */
+    border-radius: 15px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: slideDown 0.4s ease;
+}
+
+.price-notice {
+    background: #e7f3eb; /* أخضر فاتح جداً */
+    color: #1a472a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    border: 1px dashed #1a472a;
+    text-align: center;
+}
+
+#amountText {
+    font-size: 20px;
+    color: #bfa15f; /* السعر بالذهبي */
+}
+
+.receipt-card {
+    border: 2px double #bfa15f;
+    padding: 40px;
+    background: #fff;
+    width: 500px;
+    text-align: right;
+}
+
+.receipt-title {
+    color: #1a472a;
+    text-align: center;
+    border-bottom: 2px solid #bfa15f;
+    padding-bottom: 10px;
+}
+
+.payment-receipt-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px dashed #1a472a;
+}
+
+.print-btn {
+    background: #bfa15f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+.submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #1a472a 0%, #2d5a3c 100%);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.submit-btn:hover {
+    background: #bfa15f;
+    transform: translateY(-2px);}
+.close-btn {
+    flex: 1;
+    background: #f1f1f1;
+    color: #666;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* كود لإخفاء الأزرار والسايدبار عند الطباعة */
+@media print {
+    .no-print, .sidebar, .main-content form, .form-header {
+        display: none !important;
+    }
+    .modal {
+        position: static;
+        background: none;
+    }
+    .receipt-card {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
+.modal-payment {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
+}
+.payment-content, .receipt-content { background: white; padding: 25px; border-radius: 15px; width: 400px; }
+.input-readonly { background: #f0f0f0; border: 1px solid #ddd; padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 15px; }
+.input-field { border: 1px solid #1a472a; padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 15px; }
+
+/* تنسيق زر الدفع وتفعيل الحساب داخل الجدول */
+.btn-pay-activate {
+    background-color: #1a472a; /* اللون الأخضر الخاص بمشروعك */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px; /* حواف دائرية */
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-pay-activate i {
+    color: #ffc107; /* أيقونة باللون الذهبي */
+}
+
+.btn-pay-activate:hover {
+    background-color: #215c36;
+    transform: translateY(-2px); /* رفعة بسيطة عند تمرير الماوس */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* ابحثي عن معرف البطاقة في ملف الـ CSS الخاص بكِ */
+
+/* الغلاف الخارجي الشفاف */
+#activationModal {
+    display: none; 
+    position: fixed; /* يضمن بقاءها فوق الشاشة */
+    z-index: 9999; /* أعلى من كل العناصر الأخرى */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.6); /* خلفية سوداء شفافة */
+    backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية */
+     /* نستخدم flex لتوسيط المحتوى */
+}
+
+/* جسم البطاقة الخضراء */
+.payment-modal {
+    background-color: white;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out; /* حركة دخول ناعمة */
+}
+
+/* حركة الدخول من الأعلى */
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* تنسيق العناوين والحقول داخل البطاقة */
+.payment-modal h3 {
+    background-color: #1a472a; /* لونك الأخضر */
+    color: white;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.form-group {
+    padding: 15px 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.activation-note {
+    background: #f0f4f1;
+    margin: 10px 25px;
+    padding: 12px;
+    border-right: 5px solid #1a472a;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #1a472a;
+}
+
+.btn-confirm {
+    background-color: #1a472a;
+    color: white;
+    border: none;
+    width: calc(100% - 50px);
+    margin: 20px 25px;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+/* تنسيق حاوية المفتاح */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 10px;
+    background: #fdfdfd;
+    border-radius: 8px;
+}
+
+/* شكل مفتاح التبديل (Switch) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px; width: 18px;
+    left: 4px; bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider { background-color: #1a472a; }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* تنسيق زر التأكيد العريض */
+.submit-btn {
+    background-color: #1a472a;
+    color: white;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.submit-btn i {
+    font-size: 1.2rem;
+}
+/* تقليل عرض حاويات المجموعات لترك مسافة من الجوانب */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+ .class-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-top: 4px solid #1a472a;
+        transition: transform 0.2s;
+    }
+    .class-card.absent {
+        border-top-color: #cc0000;
+        background-color: #fff5f5;
+    }
+    .class-card h3 { margin: 0 0 10px 0; font-size: 1.2rem; }
+    .class-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #555; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+    /* تأكدي من إضافة هذا لضبط الحقول */
+.input-field {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: right; /* لضمان بداية النص من اليمين */
+}
+
+/* تحسين شكل بطاقة الحصة لتكون أكثر وضوحاً */
+.general-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+.general-card:hover {
+    transform: scale(1.05); /* حركة خفيفة عند تمرير الماوس */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+@media print {
+    .reception-sidebar, .confirm-btn, .stat-card {
+        display: none !important;
+    }
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+.confirm-btn {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    height: 45px; /* ليكون بنفس ارتفاع الـ Select */
+}
+
+.confirm-btn:hover {
+    background-color: #26633b; /* لون أخضر أفتح قليلاً */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.confirm-btn i {
+    font-size: 1.1rem;
+}
+@media print {
+    /* إخفاء كل شيء ما عدا الجدول */
+    .reception-sidebar, .header, .stat-card, .confirm-btn {
+        display: none !important;
+    }
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    .main-container {
+        box-shadow: none !important;
+        border: none !important;
+    }
+    body {
+        background: white !important;
+    }
+}
+input, select {
+    font-size: 1rem !important; /* حجم مناسب للقراءة */
+    color: #333 !important;      /* لون نص واضح */
+    font-weight: 600 !important;}
+
+    /* تنسيق الخيار النشط باللون الذهبي */
+/* تنسيق الإطار الذهبي الشفاف للصفحة النشطة */
+.nav-links li.active-gold {
+    background-color: rgba(212, 160, 23, 0.12); /* خلفية ذهبية شفافة جداً */
+    border: 1px solid rgba(212, 160, 23, 0.3); /* إطار ذهبي ناعم يحيط بكل العنصر */
+    color: #d4a017 !important;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.1); /* ظل ذهبي خفيف جداً يعطي عمق */
+    border-radius: 10px; /* زوايا منحنية لتناسب الإطار الشفاف */
+}
+
+
+
+/* عند تمرير الماوس على العناصر الأخرى (التأثير التفاعلي) */
+.nav-links li:not(.active-gold):hover {
+    background-color: rgba(212, 160, 23, 0.3); /* ظهور خفيف جداً للون الذهبي عند الاقتراب */
+    color: #1a472a;
+    transform: translateX(-3px);
+    transition: all 0.3s ease;
+}
