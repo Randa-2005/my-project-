@@ -1,0 +1,31 @@
+/* تنسيق المستطيل الأخضر الموحد */
+.sidebar {
+    width: 280px;
+    background-color: #0d3c1a; /* لونك الأصلي */
+    height: 100vh;            /* طول الشاشة بالكامل */
+    position: fixed;          /* ثابت عند تحريك الصفحة */
+    top: 0;
+    right: 0;                 /* جهة اليمين */
+    overflow-y: auto;         /* تفعيل التمرير الداخلي */
+    z-index: 1000;            /* ليبقى دائماً في المقدمة */
+}
+
+/* تنسيق الروابط لضمان عملها وشكلها */
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.nav-links li a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.nav-links li a:hover {
+    background: rgba(212, 175, 55, 0.2); /* تأثير عند مرور الماوس */
+    color: #d4af37; /* اللون الذهبي */
+}
