@@ -1,0 +1,6 @@
+Array
+(
+    [id] => ${id}
+    [status] => ${status}
+    [role] => ${role}
+)

@@ -1,0 +1,131 @@
+/* ملف التنسيق الموحد الفخم - مدرسة أسرتي */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #1b5e20 url('https://www.transparenttextures.com/patterns/arabesque.png'); 
+    font-family: 'Amiri', serif;
+}
+
+.card {
+    background: #fff;
+    padding: 35px 45px;
+    border-radius: 20px;
+    width: 420px; /* حجم رشيق ومتناسق */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    border: 3px solid #d4af37;
+    text-align: center;
+    position: relative;
+}
+
+h2 {
+    color: #1b5e20;
+    font-size: 28px;
+    margin-bottom: 20px;
+    border-bottom: 2px double #d4af37;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* تنسيق الخانات الموحد */
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+input {
+    width: 100%;
+    padding: 12px 45px 12px 15px; /* مسافة كافية للأيقونات */
+    border: 1.5px solid #d4af37;
+    border-radius: 10px;
+    outline: none;
+    font-size: 20px; /* تكبير الخط ليتناسب مع حجم العين */
+    font-family: 'Amiri', serif;
+    box-sizing: border-box;
+    transition: 0.3s;
+    background-color: #f9f9f9;
+}
+
+input:focus {
+    background-color: #fff;
+    border-color: #1b5e20;
+    box-shadow: 0 0 8px rgba(27, 94, 32, 0.2);
+}
+
+/* ضبط الأيقونات في المنتصف تماماً عمودياً */
+.input-group i.main-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%); /* سر التوسط العمودي */
+    color: #d4af37;
+    font-size: 22px;
+}
+
+.toggle-password {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%); /* سر التوسط العمودي للعين */
+    cursor: pointer;
+    color: #1b5e20;
+    font-size: 22px; /* حجم العين مطابق لحجم الخط */
+    z-index: 10;
+}
+
+/* تنسيق الأزرار */
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(45deg, #1b5e20, #2e7d32);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 22px; /* خط كبير وواضح */
+    font-weight: bold;
+    font-family: 'Amiri', serif;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+button:hover {
+    background: #d4af37;
+    color: #1b5e20;
+    transform: translateY(-2px);
+}
+
+.footer-link {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #555;
+}
+
+.footer-link a {
+    color: #1b5e20;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer-link a:hover {
+    color: #d4af37;
+    text-decoration: underline;
+}
+
+/* تنسيق رسائل النجاح والخطأ */
+.success-msg {
+    background: #d4edda;
+    color: #155724;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #c3e6cb;
+}
