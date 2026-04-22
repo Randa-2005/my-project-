@@ -1,5 +1,4 @@
 <?php 
- 
   $current_page = 'dash'; 
   include 'reception_sidebar.php'; 
 ?>
