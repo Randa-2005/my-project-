@@ -1,6 +1,4 @@
 <?php 
-  include 'db_connect.php';
-
 // هنا يمكنكِ لاحقاً إضافة الكود الخاص بجلب البيانات من قاعدة البيانات
   $current_page = 'dash'; 
   include 'reception_sidebar.php';
