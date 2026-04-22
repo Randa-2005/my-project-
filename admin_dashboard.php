@@ -169,12 +169,9 @@ $result = mysqli_query($conn, $sql);
         <tr id="row-<?php echo $row['id']; ?>" data-role="<?php echo $dataRole; ?>">
             <td><?php echo $row['full_name']; ?></td>
             <td><span class="badge <?php echo $roleClass; ?>"><?php echo $row['role']; ?></span></td>
-            
             <td class="st-cell" id="status-cell-<?php echo $row['id']; ?>">
                 <span class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
-            </td>
-
-            <td>
+            </td> <td>
                 <select onchange="updateRowStatus(this)" class="admin-select" data-id="<?php echo $row['id']; ?>">
                     <option value="active" <?php if($row['status'] == 'active') echo 'selected'; ?>>تنشيط الحساب</option>
                     <option value="suspended" <?php if($row['status'] == 'suspended') echo 'selected'; ?>>تعليق مؤقت</option>
