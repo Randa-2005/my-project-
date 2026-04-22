@@ -1,6 +1,4 @@
 <?php 
-  include 'db_connect.php';
-
   $current_page = 'dash'; 
   include 'reception_sidebar.php'; 
 ?>
