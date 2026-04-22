@@ -1,6 +1,4 @@
 <?php 
-include 'db_connect.php';
-
 $current_page = basename($_SERVER['PHP_SELF']); 
 ?>
 <!DOCTYPE html>
