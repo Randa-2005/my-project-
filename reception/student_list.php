@@ -1,30 +1,48 @@
 <?php 
-  $current_page = 'dash'; 
-  include 'reception_sidebar.php'; 
+// 1. إعدادات قاعدة البيانات
+$host = 'localhost';
+$dbname = 'smart_quran_schooli';
+$username = 'root';
+$password = '';
+
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("فشل الاتصال بالقاعدة: " . $e->getMessage());
+}
+
+// جلب قائمة الأفواج من قاعدة البيانات
+$groups = [];
+$stmt = $conn->query("SELECT id, group_name, teacher_name FROM groups WHERE status = 'active' ORDER BY group_name");
+$groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$current_page = 'dash'; 
+include 'reception_sidebar.php'; 
 ?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قوائم التلاميذ  </title>
+    <title>قوائم التلاميذ</title>
     <link rel="stylesheet" href="reception_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-green: #1a472a; --bg-gray: #f4f7f6; --sidebar-width: 260px; } /* حددنا عرض السيدبار هنا */
+        :root { --primary-green: #1a472a; --bg-gray: #f4f7f6; --sidebar-width: 260px; }
         
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background-color: var(--bg-gray); 
             margin: 0; 
-            display: flex; /* للسماح للسيدبار والمحتوى بالبقاء بجانب بعض */
+            display: flex;
         }
 
-        /* تعديل المحتوى الرئيسي ليبدأ بعد السيدبار */
         .main-content { 
             flex: 1; 
-            margin-right: var(--sidebar-width); /* دفع المحتوى لليسار بمقدار عرض السيدبار */
+            margin-right: var(--sidebar-width);
             padding: 30px;
             min-height: 100vh;
             transition: all 0.3s;
@@ -39,7 +57,6 @@
             padding: 25px; 
         }
 
-        /* منطقة التحكم */
         .controls-section { 
             display: flex; 
             align-items: flex-end; 
@@ -69,7 +86,6 @@
             gap: 10px;
         }
 
-        /* رأس القائمة الاحترافي */
         .list-header-info { 
             display: flex; 
             justify-content: space-between; 
@@ -81,12 +97,10 @@
             margin-top: 20px;
         }
 
-        /* الجدول */
         .students-table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #eee; }
         .students-table th { background: #f8f9fa; color: var(--primary-green); padding: 15px; border: 1px solid #eee; font-size: 0.95rem; }
         .students-table td { padding: 12px; border: 1px solid #eee; text-align: center; color: #333; }
 
-        /* ستايل الطباعة - يخفي السيدبار تماماً */
         @media print {
             .main-content { margin-right: 0 !important; padding: 0 !important; }
             .sidebar, .controls-section, .btn-print, .reception-sidebar { display: none !important; }
@@ -94,40 +108,43 @@
             .main-container { box-shadow: none; width: 100%; max-width: 100%; }
         }
 
-        /* للهواتف: إذا كان السيدبار يختفي */
         @media (max-width: 768px) {
             .main-content { margin-right: 0; padding: 15px; }
             .controls-section { flex-direction: column; align-items: stretch; }
             .btn-print { width: 100%; justify-content: center; }
         }
-        /* تنسيق زر القائمة */
-.open-sidebar-btn {
-    display: none; /* مخفي افتراضياً في الشاشات الكبيرة */
-    position: fixed;
-    top: 15px;
-    right: 15px; /* يظهر من جهة اليمين لأن اللغة عربية */
-    background: #1a472a;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    z-index: 1001; /* ليكون فوق كل العناصر */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
 
-/* إظهار الزر عند تصغير الشاشة (أقل من 768px) */
-@media (max-width: 768px) {
-    .open-sidebar-btn {
-        display: block;
-    }
-    
-    .main-content {
-        margin-right: 0 !important; /* إلغاء الهامش في الشاشات الصغيرة */
-        padding-top: 60px; /* ترك مساحة للزر في الأعلى */
-    }
-}
+        .open-sidebar-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #1a472a;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .open-sidebar-btn {
+                display: block;
+            }
+            .main-content {
+                margin-right: 0 !important;
+                padding-top: 60px;
+            }
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
@@ -136,8 +153,8 @@
 
     <main class="main-content">
         <button id="open-sidebar" class="open-sidebar-btn" onclick="toggleSidebar()">
-           <i class="fas fa-bars"></i>
-       </button>
+            <i class="fas fa-bars"></i>
+        </button>
         <div class="main-container">
             <h2 style="color: var(--primary-green); border-right: 5px solid var(--primary-green); padding-right: 15px; margin-bottom: 25px;">
                 <i class="fas fa-list-ul"></i> قوائم تلاميذ الأفواج
@@ -146,10 +163,13 @@
             <div class="controls-section">
                 <div class="filter-group">
                     <label>تصفية حسب الفوج:</label>
-                    <select id="groupSelect" class="input-field" style="flex: 1; height: 45px; margin: 0;" onchange="loadStudentList()">
+                    <select id="groupSelect" class="input-field" onchange="loadStudentList()">
                         <option value="">-- اختر الفوج لعرض القائمة --</option>
-                        <option value="g1">فوج 1 إناث</option>
-                        <option value="g2">فوج 2 ذكور</option>
+                        <?php foreach ($groups as $group): ?>
+                            <option value="<?php echo $group['id']; ?>">
+                                <?php echo htmlspecialchars($group['group_name']); ?> (أ. <?php echo htmlspecialchars($group['teacher_name']); ?>)
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <button class="btn-print" onclick="window.print()">
@@ -168,59 +188,72 @@
                         <tr>
                             <th style="width: 20%;">رقم التسجيل</th>
                             <th style="width: 50%;">الاسم واللقب</th>
-                            <th style="width: 30%;">تاريخ الازدياد</th>
+                            <th style="width: 30%;">تاريخ الميلاد</th>
                         </tr>
                     </thead>
                     <tbody id="studentsBody">
-                        </tbody>
+                        <tr class="empty-message">
+                            <td colspan="3">📋 يرجى اختيار فوج لعرض القائمة</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </main>
 
 <script>
-    const studentsData = {
-        g1: {
-            groupName: "فوج 1 إناث",
-            teacher: "أ. بن قاسم ياسين",
-            students: [
-                { regNum: "REG-2026-01", name: "نور الهدى بوقرة", birthDate: "2010-01-15" },
-                { regNum: "REG-2026-02", name: "إيمان بن ساعد", birthDate: "2009-05-22" }
-            ]
-        },
-        g2: {
-            groupName: "فوج 2 ذكور",
-            teacher: "أ. مراد بوعلام",
-            students: [
-                { regNum: "REG-2026-10", name: "محمد علي جبار", birthDate: "2011-03-10" },
-                { regNum: "REG-2026-11", name: "سامي بوعبد الله", birthDate: "2010-12-05" }
-            ]
-        }
-    };
-
-    function loadStudentList() {
-        const val = document.getElementById('groupSelect').value;
-        const container = document.getElementById('listInfo');
-        const body = document.getElementById('studentsBody');
-        
-        if (val && studentsData[val]) {
-            container.style.display = 'block';
-            const data = studentsData[val];
-            
-            document.getElementById('displayGroupName').innerHTML = `<i class="fas fa-users"></i> الفوج: ${data.groupName}`;
-            document.getElementById('displayTeacherName').innerHTML = `<i class="fas fa-chalkboard-teacher"></i> الأستاذ: ${data.teacher}`;
-
-            body.innerHTML = data.students.map(s => `
-                <tr>
-                    <td><strong>${s.regNum}</strong></td>
-                    <td style="text-align: right; padding-right: 25px;">${s.name}</td>
-                    <td>${s.birthDate}</td>
-                </tr>
-            `).join('');
-        } else {
-            container.style.display = 'none';
-        }
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if(sidebar) {
+        sidebar.classList.toggle('active');
     }
+}
+
+function loadStudentList() {
+    const groupId = document.getElementById('groupSelect').value;
+    const listInfo = document.getElementById('listInfo');
+    const studentsBody = document.getElementById('studentsBody');
+    
+    if (!groupId) {
+        listInfo.style.display = 'none';
+        return;
+    }
+    
+    // إظهار مؤشر تحميل
+    studentsBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">⏳ جاري التحميل...</td></tr>';
+    listInfo.style.display = 'block';
+    
+    // جلب بيانات الفوج والتلاميذ عبر AJAX
+    fetch('get_group_students.php?group_id=' + groupId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                studentsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">❌ ' + data.error + '</td></tr>';
+                return;
+            }
+            
+            // عرض معلومات الفوج
+            document.getElementById('displayGroupName').innerHTML = '<i class="fas fa-users"></i> الفوج: ' + data.group_name;
+            document.getElementById('displayTeacherName').innerHTML = '<i class="fas fa-chalkboard-teacher"></i> الأستاذ: ' + data.teacher_name;
+            
+            // عرض قائمة التلاميذ
+            if (data.students.length === 0) {
+                studentsBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">📭 لا يوجد تلاميذ مسجلين في هذا الفوج</td></tr>';
+            } else {
+                studentsBody.innerHTML = data.students.map(student => `
+                    <tr>
+                        <td><strong>#${student.id}</strong></td>
+                        <td style="text-align: right; padding-right: 25px;">${student.full_name}</td>
+                        <td>${student.birth_date}</td>
+                    </tr>
+                `).join('');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            studentsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">❌ خطأ في تحميل البيانات</td></tr>';
+        });
+}
 </script>
 
 </body>
