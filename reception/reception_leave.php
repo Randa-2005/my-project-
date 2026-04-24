@@ -14,14 +14,9 @@ try {
     die("فشل الاتصال بالقاعدة: " . $e->getMessage());
 }
 
-// التحقق من أن الموظف مسجل دخول
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'موظف') {
-    header("Location: ../login.php");
-    exit();
-}
-
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['full_name'];
+// جلب البيانات من الجلسة (إذا كانت موجودة)
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1; // قيمة افتراضية
+$user_name = "نور"; // الاسم الثابت
 
 // معالجة إرسال الطلب
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_leave'])) {
@@ -31,9 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_leave'])) {
     $reason = trim($_POST['reason']);
     $document_path = null;
     
-    // معالجة رفع الملف
+    // رفع الملف
     if (isset($_FILES['doc']) && $_FILES['doc']['error'] == 0) {
-        $upload_dir = 'uploads/leaves/';
+        $upload_dir = '../uploads/leaves/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -73,12 +68,11 @@ include 'reception_sidebar.php';
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تقديم طلب عطلة</title>
     <link rel="stylesheet" href="reception_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1a472a; --accent: #ffc107; }
+        :root { --primary: #1a472a; }
         
         .leave-card { 
             background: white; 
@@ -114,7 +108,6 @@ include 'reception_sidebar.php';
             border-radius: 12px;
             background: #fafafa;
             cursor: pointer;
-            transition: all 0.3s;
         }
         
         .upload-zone:hover {
@@ -127,8 +120,6 @@ include 'reception_sidebar.php';
             gap: 15px;
             margin-top: 25px;
             width: 100%;
-            padding: 0 20px;
-            box-sizing: border-box;
         }
 
         .submit-btn, .cancel-btn {
@@ -140,9 +131,6 @@ include 'reception_sidebar.php';
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
             border: none;
         }
 
@@ -163,10 +151,6 @@ include 'reception_sidebar.php';
             border: 1px solid #ddd;
         }
 
-        .cancel-btn:hover {
-            background-color: #e0e0e0;
-        }
-
         .open-sidebar-btn {
             display: none;
             position: fixed;
@@ -174,32 +158,18 @@ include 'reception_sidebar.php';
             right: 15px;
             background: #1a472a;
             color: white;
-            border: none;
             padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1.2rem;
             z-index: 1001;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         @media (max-width: 768px) {
-            .open-sidebar-btn {
-                display: block;
-            }
-            .main-content {
-                margin-right: 0 !important;
-                padding-top: 60px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .full-width {
-                grid-column: span 1;
-            }
-            .btn-group {
-                flex-direction: column;
-            }
+            .open-sidebar-btn { display: block; }
+            .main-content { margin-right: 0 !important; padding-top: 60px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .btn-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -221,7 +191,8 @@ include 'reception_sidebar.php';
                     <div class="form-grid">
                         <div class="input-group full-width">
                             <label><i class="fas fa-user"></i> الاسم واللقب:</label>
-                            <input type="text" class="input-field" style="background:#f9f9f9;" value="<?php echo htmlspecialchars($user_name); ?>" readonly>
+                            <input type="text" class="input-field" style="background:#f9f9f9;" 
+                                   value="نور" readonly>
                         </div>
 
                         <div class="input-group full-width">
@@ -240,11 +211,11 @@ include 'reception_sidebar.php';
                         
                         <div class="input-group full-width">
                             <label><i class="fas fa-pen"></i> سبب طلب العطلة بالتفصيل:</label>
-                            <textarea name="reason" class="input-field" placeholder="اكتب تبريرك الوافي هنا..." required></textarea>
+                            <textarea name="reason" class="input-field" placeholder="اكتب تبريرك هنا..." required></textarea>
                         </div>
 
                         <div class="input-group full-width">
-                            <label><i class="fas fa-paperclip"></i> إرفاق الوثيقة (اختياري - PDF, JPG, PNG):</label>
+                            <label><i class="fas fa-paperclip"></i> إرفاق الوثيقة (اختياري):</label>
                             <div class="upload-zone" onclick="document.getElementById('fileInp').click()">
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary);"></i>
                                 <p id="fileMsg">اضغط لتحميل الشهادة الطبية أو المبرر</p>
@@ -257,7 +228,7 @@ include 'reception_sidebar.php';
                                 <i class="fas fa-paper-plane"></i> تأكيد وإرسال الطلب
                             </button>
                             <button type="button" class="cancel-btn" onclick="history.back()">
-                                <i class="fas fa-times"></i> إلغاء العملية
+                                <i class="fas fa-times"></i> إلغاء
                             </button>
                         </div>
                     </div>
@@ -279,7 +250,6 @@ include 'reception_sidebar.php';
             const msg = document.getElementById('fileMsg');
             if(inp.files.length > 0) {
                 msg.innerHTML = "<i class='fas fa-check-circle' style='color: #1a472a;'></i> <b>تم اختيار:</b> " + inp.files[0].name;
-                msg.style.color = "#1a472a";
             }
         }
     </script>
