@@ -58,6 +58,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_all'])) {
                 ':to_ayah' => $data['to_ayah'],
                 ':score' => $data['score']
             ]);
+            
+            // ========== ✅ تحديث تقدم الطالب في جدول student_progress ==========
+            $student_id = $data['student_id'];
+            $surah_name = $data['surah'];
+            $to_ayah = $data['to_ayah'];
+            $score = $data['score'];
+            
+            // التحقق من وجود سجل تقدم للطالب
+            $check = $conn->prepare("SELECT id FROM student_progress WHERE student_id = :id");
+            $check->execute([':id' => $student_id]);
+            
+            if ($check->rowCount() > 0) {
+                // تحديث السجل الموجود
+                $update = $conn->prepare("
+                    UPDATE student_progress 
+                    SET current_surah = :surah, 
+                        current_ayah = :ayah,
+                        total_score = total_score + :score,
+                        memorized_parts = FLOOR((total_score + :score) / 20),
+                        memorized_juz = FLOOR(FLOOR((total_score + :score) / 20) / 2)
+                    WHERE student_id = :id
+                ");
+                $update->execute([
+                    ':id' => $student_id,
+                    ':surah' => $surah_name,
+                    ':ayah' => $to_ayah,
+                    ':score' => $score
+                ]);
+            } else {
+                // إنشاء سجل جديد للطالب
+                $insert = $conn->prepare("
+                    INSERT INTO student_progress (student_id, current_surah, current_ayah, total_score, memorized_parts, memorized_juz) 
+                    VALUES (:id, :surah, :ayah, :score, FLOOR(:score / 20), FLOOR(FLOOR(:score / 20) / 2))
+                ");
+                $insert->execute([
+                    ':id' => $student_id,
+                    ':surah' => $surah_name,
+                    ':ayah' => $to_ayah,
+                    ':score' => $score
+                ]);
+            }
+            // ================================================================
         }
     }
     
@@ -238,14 +280,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_exam'])) {
                     <tr class="exam-row" data-id="<?php echo $student['id']; ?>" data-absent="<?php echo $isAbsent ? '1' : '0'; ?>">
                         <td><?php echo htmlspecialchars($student['full_name']); ?></td>
                         <?php if ($isAbsent): ?>
-                            <td colspan="4" style="color:#c62828;">🚫 غائب</td>
+                            <td colspan="4" style="color:#c62828;">🚫 غائب<\/td>
                         <?php else: ?>
-                            <td class="stars hifz"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
-                            <td class="stars ahkam"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
-                            <td class="stars makh"><?php for($i=1;$i<=4;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
-                            <td class="total">0 / 20</td>
+                            <td class="stars hifz"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
+                            <td class="stars ahkam"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
+                            <td class="stars makh"><?php for($i=1;$i<=4;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
+                            <td class="total">0 / 20<\/td>
                         <?php endif; ?>
-                    </tr>
+                    </td>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -306,17 +348,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_exam'])) {
                 
                 if (isAbsent) {
                     examRow.innerHTML = `
-                        <td>${studentName}</td>
-                        <td colspan="4" style="color:#c62828;">🚫 غائب</td>
+                        <td>${studentName}<\/td>
+                        <td colspan="4" style="color:#c62828;">🚫 غائب<\/td>
                     `;
                     examRow.setAttribute('data-absent', '1');
                 } else {
                     examRow.innerHTML = `
-                        <td>${studentName}</td>
-                        <td class="stars hifz"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
-                        <td class="stars ahkam"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
-                        <td class="stars makh"><?php for($i=1;$i<=4;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
-                        <td class="total">0 / 20</td>
+                        <td>${studentName}<\/td>
+                        <td class="stars hifz"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
+                        <td class="stars ahkam"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
+                        <td class="stars makh"><?php for($i=1;$i<=4;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
+                        <td class="total">0 / 20<\/td>
                     `;
                     examRow.setAttribute('data-absent', '0');
                     attachStarEvents(examRow);
