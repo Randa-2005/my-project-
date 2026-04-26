@@ -202,6 +202,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['activate_student'])) {
     }
 }
 
+// ========== جلب الحصص الجارية الآن من قاعدة البيانات ==========
+$current_time = date('H:i:s');
+$current_day = date('l');
+$days_map = [
+    'Monday' => 'الإثنين',
+    'Tuesday' => 'الثلاثاء',
+    'Wednesday' => 'الأربعاء',
+    'Thursday' => 'الخميس',
+    'Friday' => 'الجمعة',
+    'Saturday' => 'السبت',
+    'Sunday' => 'الأحد'
+];
+$current_day_ar = $days_map[$current_day] ?? '';
+
+$stmt = $conn->prepare("
+    SELECT s.*, g.group_name, r.room_number, s.teacher_name 
+    FROM schedules s
+    JOIN groups g ON s.group_id = g.id
+    JOIN rooms r ON s.room_id = r.id
+    WHERE s.day = :day 
+    AND s.start_time <= :current_time 
+    AND s.end_time >= :current_time
+    AND s.status = 'active'
+");
+$stmt->execute([':day' => $current_day_ar, ':current_time' => $current_time]);
+$current_sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sessions_json = [];
+foreach ($current_sessions as $session) {
+    $start = strtotime($session['start_time']);
+    $end = strtotime($session['end_time']);
+    $duration = ($end - $start) / 60;
+    $sessions_json[] = [
+        'teacher' => $session['teacher_name'],
+        'group' => $session['group_name'],
+        'room' => $session['room_number'],
+        'startTime' => date('H:i', strtotime($session['start_time'])),
+        'duration' => $duration,
+        'isAbsent' => false
+    ];
+}
+
 include 'reception_sidebar.php';
 
 // عرض الوصل إذا وجد
@@ -372,13 +414,12 @@ if(isset($_SESSION['receipt_data_payment'])) {
                                     <td><?php echo htmlspecialchars($request['full_name']); ?></td>
                                     <td><?php echo htmlspecialchars($request['academic_level'] ?? 'غير محدد'); ?></td>
                                     <td><?php echo htmlspecialchars($request['phone'] ?? 'غير مدخل'); ?></td>
-                                    
+                                    <td>قيد الانتظار</td>
                                     <td>
                                         <button class="btn-pay-activate" onclick="openActivationModal(<?php echo $request['id']; ?>, '<?php echo htmlspecialchars($request['full_name']); ?>')">
                                             <i class="fas fa-check-circle"></i> دفع وتفعيل الحساب
                                         </button>
                                     </td>
-                                    <td>قيد الانتظار</td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -440,7 +481,7 @@ if(isset($_SESSION['receipt_data_payment'])) {
     </div>
     
     <!-- نافذة تسجيل عملية دفع جديدة (تجديد) -->
-    <div id="generalPaymentModel" class="modal">
+    <div id="generalPaymentModel" class="modal" style="display: none;">
         <div style="background-color: white; width: 500px; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3); margin: auto;">
             <div style="background-color: #1a472a; color: white; padding: 20px; text-align: center;">
                 <h3 style="margin: 0;"><i class="fas fa-credit-card"></i> تجديد اشتراك تلميذ</h3>
@@ -577,7 +618,6 @@ function finalizeActivation() {
         return;
     }
     
-    // تعبئة بيانات الوصل
     document.getElementById('rStudentName').innerText = fullName;
     document.getElementById('rStudentPhone').innerText = "";
     document.getElementById('rType').innerText = typeText;
@@ -588,7 +628,6 @@ function finalizeActivation() {
     closeActivationModal();
     document.getElementById('receiptModal').style.display = 'block';
     
-    // إرسال البيانات
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '';
@@ -694,14 +733,12 @@ function processGeneralPayment() {
     const typeText = typeSelect.options[typeSelect.selectedIndex].text;
     const amount = document.getElementById('gen_amount').value;
     
-    // تعبئة بيانات الوصل
     document.getElementById('rStudentName').innerText = fullName;
     document.getElementById('rStudentPhone').innerText = studentPhone;
     document.getElementById('rType').innerText = typeText;
     document.getElementById('rAmount').innerText = amount;
     document.getElementById('rDate').innerText = new Date().toLocaleDateString('ar-DZ');
     
-    // إرسال البيانات
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '';
@@ -763,11 +800,8 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// الحصص الجارية
-const scheduleData = [
-    { teacher: "أ. ياسين بلقاسم", group: "فوج 01 - رياضيات", room: "قاعة 05", startTime: "13:00", duration: 120, isAbsent: false },
-    { teacher: "أ. فاطمة الزهراء", group: "فوج 03 - فيزياء", room: "قاعة 02", startTime: "13:00", duration: 120, isAbsent: true }
-];
+// ========== الحصص الجارية من قاعدة البيانات ==========
+const scheduleData = <?php echo json_encode($sessions_json); ?>;
 
 function updateCurrentClasses() {
     try {
@@ -777,10 +811,12 @@ function updateCurrentClasses() {
         const currentMin = now.getHours() * 60 + now.getMinutes();
         container.innerHTML = ""; 
         let found = false;
+        
         scheduleData.forEach(function(session) {
             const timeParts = session.startTime.split(':');
             const start = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
             const end = start + session.duration;
+            
             if (currentMin >= start && currentMin < end) {
                 found = true;
                 const card = document.createElement('div');
@@ -789,6 +825,7 @@ function updateCurrentClasses() {
                 container.appendChild(card);
             }
         });
+        
         if (!found) {
             container.innerHTML = "<p style='text-align:center; color:#999; padding:20px;'>لا توجد حصص جارية حالياً.</p>";
         }
