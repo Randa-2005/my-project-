@@ -1,8 +1,61 @@
+<?php
+session_start();
+$host = 'localhost';
+$dbname = 'smart_quran_schooli';
+$username = 'root';
+$password = '';
+
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("فشل الاتصال بقاعدة البيانات: " . $e->getMessage());
+}
+
+// ✅ تعيين بيانات الطالبة مباشرة (بدون تسجيل دخول)
+$student_name = "Amira";
+
+$stmt = $conn->prepare("SELECT id, full_name FROM users WHERE full_name = :name OR full_name LIKE :name_like");
+$stmt->execute([':name' => $student_name, ':name_like' => '%' . $student_name . '%']);
+$student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$student) {
+    die("الطالبة '$student_name' غير موجودة في قاعدة البيانات");
+}
+
+$student_id = $student['id'];
+$student_display_name = $student['full_name'];
+
+// ========== 1️⃣ جلب سجل نتائج الاختبارات ==========
+$stmt = $conn->prepare("
+    SELECT e.exam_date, 
+           er.hifz_score, 
+           er.ahkam_score, 
+           er.makharij_score, 
+           er.total_score
+    FROM exam_results er
+    JOIN exams e ON er.exam_id = e.id
+    WHERE er.student_id = :student_id
+    ORDER BY e.exam_date DESC
+");
+$stmt->execute([':student_id' => $student_id]);
+$exam_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// ========== 2️⃣ حساب الإحصائيات ==========
+$total_exams = count($exam_results);
+$last_avg = 0;
+if ($total_exams > 0) {
+    $last_avg = $exam_results[0]['total_score'] ?? 0;
+}
+
+include 'student_sidebar.php';
+?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title> كشف نقاطي</title>
+    <title>كشف نقاطي - مدرسة أسرتي القرآنية</title>
     <link rel="stylesheet" href="student_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -21,7 +74,6 @@
             display: flex;
         }
 
-        /* تنسيق المحتوى الرئيسي بجانب السايدبار */
         .main-content {
             flex: 1;
             margin-right: var(--sidebar-width);
@@ -29,7 +81,6 @@
             min-height: 100vh;
         }
 
-        /* الهيدر العلوي */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -43,7 +94,6 @@
 
         .top-bar h2 { color: var(--primary-green); margin: 0; }
 
-        /* إحصائيات سريعة للتلميذ */
         .stats-container {
             display: flex;
             gap: 20px;
@@ -65,7 +115,6 @@
         .stat-box .info h4 { margin: 0; color: #666; font-size: 0.9rem; }
         .stat-box .info p { margin: 5px 0 0; font-size: 1.2rem; font-weight: bold; color: var(--primary-green); }
 
-        /* الجدول */
         .table-wrapper {
             background: var(--white);
             border-radius: 15px;
@@ -82,16 +131,16 @@
             background: var(--primary-green);
             color: var(--white);
             padding: 18px;
-            text-align: right;
+            text-align: center;
         }
 
         .history-table td {
             padding: 15px;
             border-bottom: 1px solid #eee;
             color: #444;
+            text-align: center;
         }
 
-        /* تنسيق العلامات */
         .score-tag {
             background: var(--light-green);
             padding: 5px 12px;
@@ -99,6 +148,7 @@
             font-weight: bold;
             color: var(--primary-green);
             border: 1px solid #d4edda;
+            display: inline-block;
         }
 
         .final-grade {
@@ -107,42 +157,55 @@
             font-size: 1.1rem;
         }
 
-        /* ملاحظة الأستاذ */
-        .teacher-note {
-            font-style: italic;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        /* السايدبار */
         .sidebar {
             position: fixed;
             right: 0;
             top: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: var(--primary-green); /* تأكدي من لون سايدبارك المعتاد */
+            background: var(--primary-green);
             color: white;
             z-index: 1000;
             background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
-    
-            /* هذه الخاصية ضرورية جداً لدمج النقش مع الأخضر */
-            background-blend-mode: multiply; 
-    
-              /* لتكرار النقش بشكل صحيح */
-              background-repeat: repeat;
-             background-size: 100px;
+            background-blend-mode: multiply;
+            background-repeat: repeat;
+            background-size: 100px;
+        }
+
+        .toggle-menu-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1100;
+        }
+
+        @media (max-width: 768px) {
+            .toggle-menu-btn { display: block; }
+            .main-content { margin-right: 0 !important; padding-top: 60px; }
+            .stats-container { flex-direction: column; }
+            .history-table th, .history-table td { padding: 10px; font-size: 12px; }
         }
     </style>
 </head>
 <body>
 
-         <?php include 'student_sidebar.php'; ?>
-        <main class="main-content">
+    <?php include 'student_sidebar.php'; ?>
+    <button class="toggle-menu-btn" id="open-sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <main class="main-content">
         <header class="top-bar">
             <h2><i class="fas fa-award"></i> سجل نتائج اختباراتي</h2>
             <div class="student-meta">
-                <span>المستوى: <strong>متوسط</strong></span>
+                <span>المستوى: <strong><?php echo htmlspecialchars($student_display_name); ?></strong></span>
             </div>
         </header>
 
@@ -151,14 +214,14 @@
                 <i class="fas fa-file-signature"></i>
                 <div class="info">
                     <h4>عدد الاختبارات</h4>
-                    <p>05 اختبارات</p>
+                    <p><?php echo $total_exams; ?> اختبارات</p>
                 </div>
             </div>
             <div class="stat-box">
                 <i class="fas fa-star"></i>
                 <div class="info">
                     <h4>آخر معدل</h4>
-                    <p>18 / 20</p>
+                    <p><?php echo $last_avg; ?> / 20</p>
                 </div>
             </div>
         </div>
@@ -172,30 +235,38 @@
                         <th>أحكام (8)</th>
                         <th>مخارج (4)</th>
                         <th>المجموع</th>
-                        <th>ملاحظة الأستاذ</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2026-04-14</td>
-                        <td><span class="score-tag">7.5</span></td>
-                        <td><span class="score-tag">7</span></td>
-                        <td><span class="score-tag">3.5</span></td>
-                        <td class="final-grade">18 / 20</td>
-                        <td class="teacher-note">ممتاز، واصل مراجعة مخارج الحروف الشجرية.</td>
-                    </tr>
-                    <tr>
-                        <td>2026-03-20</td>
-                        <td><span class="score-tag">6</span></td>
-                        <td><span class="score-tag">5</span></td>
-                        <td><span class="score-tag">3</span></td>
-                        <td class="final-grade">14 / 20</td>
-                        <td class="teacher-note">تحسن جيد، ركز أكثر على أحكام النون الساكنة.</td>
-                    </tr>
+                    <?php if (count($exam_results) > 0): ?>
+                        <?php foreach ($exam_results as $result): ?>
+                            <tr>
+                                <td><?php echo date('Y-m-d', strtotime($result['exam_date'])); ?></td>
+                                <td><span class="score-tag"><?php echo $result['hifz_score']; ?></span></td>
+                                <td><span class="score-tag"><?php echo $result['ahkam_score']; ?></span></td>
+                                <td><span class="score-tag"><?php echo $result['makharij_score']; ?></span></td>
+                                <td class="final-grade"><?php echo $result['total_score']; ?> / 20</td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" style="text-align: center;">لا توجد نتائج اختبارات مسجلة</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </main>
 
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            if (sidebar) {
+                sidebar.classList.toggle('collapsed');
+                if (mainContent) mainContent.classList.toggle('expanded');
+            }
+        }
+    </script>
 </body>
 </html>
