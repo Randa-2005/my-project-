@@ -56,12 +56,13 @@ if (isset($_GET['get_student'])) {
     exit;
 }
 
-// ========== جلب طلبات التسجيل الجديدة (الطلاب اللي حالتهم pending) ==========
+// ========== جلب طلبات التسجيل الجديدة (الطلاب اللي حالتهم pending وغير مفعلين) ==========
 $pending_requests = [];
 $stmt = $conn->prepare("SELECT id, full_name, phone, academic_level 
                         FROM users 
                         WHERE (role = 'student' OR role = 'طالب') 
                         AND status = 'pending' 
+                        AND is_verified = 0
                         ORDER BY id DESC");
 $stmt->execute();
 $pending_requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
