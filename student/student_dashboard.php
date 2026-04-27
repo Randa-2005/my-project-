@@ -41,6 +41,13 @@ if (!$progress) {
     $progress = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+$current_surah_name = $progress['current_surah'] ?? 'الفاتحة';
+$current_ayah = $progress['current_ayah'] ?? 0;
+
+// ✅ تنظيف اسم السورة (إزالة كلمة "سورة" المكررة)
+$current_surah_name = str_replace('سورة ', '', $current_surah_name);
+$current_surah_name = str_replace('سورة', '', $current_surah_name);
+
 // جلب بيانات التقييم
 $stmt = $conn->prepare("
     SELECT SUM(memorization_score) as total_score, 
@@ -57,9 +64,28 @@ $total_sessions = $eval_data['total_sessions'] ?? 1;
 $present_count = $eval_data['present_count'] ?? 0;
 $attendance_rate = ($total_sessions > 0) ? round(($present_count / $total_sessions) * 100) : 0;
 
-$memorized_parts = floor($total_score / 20);
-$memorized_juz = floor($memorized_parts / 2);
+// ========== ✅ حساب عدد الأحزاب بناءً على آخر آية ==========
+// التحقق من وجود جدول parts
+$check_parts = $conn->query("SHOW TABLES LIKE 'parts'");
+if ($check_parts->rowCount() > 0) {
+    // عدد الأحزاب المحفوظة من جدول parts
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as completed_parts 
+        FROM parts 
+        WHERE (start_surah < :surah) 
+           OR (start_surah = :surah AND start_ayah <= :ayah)
+    ");
+    $stmt->execute([':surah' => $current_surah_name, ':ayah' => $current_ayah]);
+    $parts_result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $memorized_parts = $parts_result['completed_parts'] ?? 1;
+    $memorized_juz = ceil($memorized_parts / 2);
+} else {
+    // إذا لم يكن جدول parts موجوداً
+    $memorized_parts = 1;
+    $memorized_juz = 1;
+}
 
+// تحديث جدول التقدم
 $update = $conn->prepare("UPDATE student_progress SET memorized_parts = :parts, memorized_juz = :juz, total_score = :score WHERE student_id = :id");
 $update->execute([
     ':parts' => $memorized_parts, 
@@ -96,36 +122,76 @@ $stmt = $conn->prepare("
 $stmt->execute([':id' => $student_id]);
 $last_note = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// جلب الحصة القادمة
-$current_day = date('l');
+
 $days_map = [
+    'Saturday' => 'السبت',
+    'Sunday' => 'الأحد',
     'Monday' => 'الإثنين',
     'Tuesday' => 'الثلاثاء',
     'Wednesday' => 'الأربعاء',
     'Thursday' => 'الخميس',
-    'Friday' => 'الجمعة',
-    'Saturday' => 'السبت',
-    'Sunday' => 'الأحد'
+    'Friday' => 'الجمعة'
 ];
-$current_day_ar = $days_map[$current_day] ?? '';
+$current_day_ar = $days_map[date('l')] ?? '';
+$current_time = date('H:i:s');
 
+// جلب فوج الطالب أولاً
+$stmt = $conn->prepare("SELECT group_id FROM users WHERE id = :id");
+$stmt->execute([':id' => $student_id]);
+$user_group = $stmt->fetch(PDO::FETCH_ASSOC);
+$user_group_id = $user_group['group_id'] ?? 0;
+
+// جلب اسم الفوج
+$stmt = $conn->prepare("SELECT group_name FROM groups WHERE id = :id");
+$stmt->execute([':id' => $user_group_id]);
+$user_group_info = $stmt->fetch(PDO::FETCH_ASSOC);
+$user_group_name = $user_group_info['group_name'] ?? '';
+
+// جلب جميع حصص هذا الفوج فقط (وليس كل الحصص)
 $stmt = $conn->prepare("
     SELECT s.day, s.start_time, s.end_time, r.room_number, g.group_name
     FROM schedules s
     JOIN groups g ON s.group_id = g.id
     JOIN rooms r ON s.room_id = r.id
-    JOIN users u ON u.group_id = g.id
-    WHERE u.id = :id AND s.day = :day AND s.status = 'active'
-    LIMIT 1
+    WHERE s.group_id = :group_id AND s.status = 'active'
+    ORDER BY 
+        FIELD(s.day, 'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'),
+        s.start_time ASC
 ");
-$stmt->execute([':id' => $student_id, ':day' => $current_day_ar]);
-$next_session = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->execute([':group_id' => $user_group_id]);
+$all_sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$days_order = ['السبت'=>1, 'الأحد'=>2, 'الإثنين'=>3, 'الثلاثاء'=>4, 'الأربعاء'=>5, 'الخميس'=>6];
+$today_order = $days_order[$current_day_ar] ?? 7;
+$current_time_seconds = strtotime($current_time);
+
+$next_session = null;
+$best_day_diff = 999;
+$best_time = null;
+
+foreach ($all_sessions as $session) {
+    $session_day_order = $days_order[$session['day']] ?? 7;
+    $session_time_seconds = strtotime($session['start_time']);
+    
+    // حساب الفرق بالأيام
+    $day_diff = $session_day_order - $today_order;
+    if ($day_diff < 0) $day_diff += 7;
+    
+    // إذا كان اليوم هو نفسه ووقت الحصة مضى، تخطى
+    if ($day_diff == 0 && $session_time_seconds <= $current_time_seconds) {
+        continue;
+    }
+    
+    // إذا كان الفرق أقل أو نفس الفرق ووقت أبكر
+    if ($day_diff < $best_day_diff || 
+        ($day_diff == $best_day_diff && $session_time_seconds < ($best_time ?? 99999))) {
+        $best_day_diff = $day_diff;
+        $best_time = $session_time_seconds;
+        $next_session = $session;
+    }
+}
 // ========== حساب التقدم في السورة ==========
-$current_surah_name = $progress['current_surah'] ?? 'الفاتحة';
-$current_ayah = $progress['current_ayah'] ?? 0;
-
-// ✅ جلب معلومات السورة (الآن surah_name_ar له قيم صحيحة)
+// جلب معلومات السورة (عدد الآيات الصحيح)
 $stmt = $conn->prepare("SELECT surah_number, total_ayahs, surah_name_ar FROM surahs WHERE surah_name_ar = :surah OR surah_name = :surah");
 $stmt->execute([':surah' => $current_surah_name]);
 $surah_info = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -133,6 +199,11 @@ $surah_info = $stmt->fetch(PDO::FETCH_ASSOC);
 $total_ayahs = $surah_info['total_ayahs'] ?? 7;
 $current_surah_num = $surah_info['surah_number'] ?? 1;
 $surah_display_name = $surah_info['surah_name_ar'] ?? $current_surah_name;
+
+// ✅ التأكد من أن الآية لا تتجاوز عدد الآيات
+if ($current_ayah > $total_ayahs) {
+    $current_ayah = $total_ayahs;
+}
 
 $target_progress = ($total_ayahs > 0) ? min(round(($current_ayah / $total_ayahs) * 100), 100) : 0;
 
