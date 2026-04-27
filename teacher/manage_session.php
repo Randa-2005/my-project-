@@ -15,15 +15,44 @@ try {
 $group_id = isset($_GET['group_id']) ? intval($_GET['group_id']) : 0;
 $today_date = date('Y-m-d');
 
+// جلب جميع السور من قاعدة البيانات مرة واحدة
+$all_surahs = [];
+$surahs_stmt = $conn->query("SELECT surah_name_ar FROM surahs ORDER BY surah_number");
+while ($s = $surahs_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $all_surahs[] = $s['surah_name_ar'];
+}
+
 if ($group_id > 0) {
     $stmt = $conn->prepare("SELECT group_name FROM groups WHERE id = :id");
     $stmt->execute([':id' => $group_id]);
     $group = $stmt->fetch(PDO::FETCH_ASSOC);
     $group_name = $group['group_name'] ?? 'غير معروف';
     
+    // جلب تلاميذ الفوج
     $stmt = $conn->prepare("SELECT id, full_name FROM users WHERE group_id = :group_id AND (role = 'student' OR role = 'طالب') ORDER BY full_name");
     $stmt->execute([':group_id' => $group_id]);
-    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $students_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // ✅ جلب آخر سورة وآية لكل طالب من التقييم السابق
+    $students = [];
+    foreach ($students_data as $student) {
+        $stmt = $conn->prepare("
+            SELECT surah_name, to_ayah 
+            FROM daily_evaluation 
+            WHERE student_id = :student_id 
+            ORDER BY evaluation_date DESC, session_time DESC 
+            LIMIT 1
+        ");
+        $stmt->execute([':student_id' => $student['id']]);
+        $last = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $students[] = [
+            'id' => $student['id'],
+            'full_name' => $student['full_name'],
+            'last_surah' => $last ? $last['surah_name'] : 'الفاتحة',
+            'last_ayah' => $last ? ($last['to_ayah'] + 1) : 1
+        ];
+    }
 } else {
     $group_name = 'غير معروف';
     $students = [];
@@ -59,18 +88,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_all'])) {
                 ':score' => $data['score']
             ]);
             
-            // ========== ✅ تحديث تقدم الطالب في جدول student_progress ==========
+            // تحديث تقدم الطالب في جدول student_progress
             $student_id = $data['student_id'];
             $surah_name = $data['surah'];
             $to_ayah = $data['to_ayah'];
             $score = $data['score'];
             
-            // التحقق من وجود سجل تقدم للطالب
             $check = $conn->prepare("SELECT id FROM student_progress WHERE student_id = :id");
             $check->execute([':id' => $student_id]);
             
             if ($check->rowCount() > 0) {
-                // تحديث السجل الموجود
                 $update = $conn->prepare("
                     UPDATE student_progress 
                     SET current_surah = :surah, 
@@ -87,7 +114,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_all'])) {
                     ':score' => $score
                 ]);
             } else {
-                // إنشاء سجل جديد للطالب
                 $insert = $conn->prepare("
                     INSERT INTO student_progress (student_id, current_surah, current_ayah, total_score, memorized_parts, memorized_juz) 
                     VALUES (:id, :surah, :ayah, :score, FLOOR(:score / 20), FLOOR(FLOOR(:score / 20) / 2))
@@ -99,7 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_all'])) {
                     ':score' => $score
                 ]);
             }
-            // ================================================================
         }
     }
     
@@ -232,13 +257,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_exam'])) {
                             </td>
                             <td>
                                 <select name="surah_<?php echo $student['id']; ?>" id="surah_<?php echo $student['id']; ?>" class="select-input" <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>>
-                                    <option>سورة الفاتحة</option><option>سورة البقرة</option><option>سورة آل عمران</option>
-                                    <option>سورة النساء</option><option>سورة المائدة</option>
+                                    <?php foreach ($all_surahs as $surah_name): ?>
+                                        <option value="<?php echo htmlspecialchars($surah_name); ?>" 
+                                            <?php echo ($surah_name == $student['last_surah']) ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($surah_name); ?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </td>
-                            <td><input type="number" name="from_ayah_<?php echo $student['id']; ?>" id="from_<?php echo $student['id']; ?>" class="score-input" value="1" min="1" <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>></td>
-                            <td><input type="number" name="to_ayah_<?php echo $student['id']; ?>" id="to_<?php echo $student['id']; ?>" class="score-input" value="1" min="1" <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>></td>
-                            <td><input type="number" name="score_<?php echo $student['id']; ?>" id="score_<?php echo $student['id']; ?>" class="score-input" min="0" max="20" value="0" <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>></td>
+                            <td>
+                                <input type="number" name="from_ayah_<?php echo $student['id']; ?>" 
+                                       id="from_<?php echo $student['id']; ?>" 
+                                       class="score-input" 
+                                       value="<?php echo $student['last_ayah']; ?>" 
+                                       min="1" 
+                                       <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>>
+                            </td>
+                            <td>
+                                <input type="number" name="to_ayah_<?php echo $student['id']; ?>" 
+                                       id="to_<?php echo $student['id']; ?>" 
+                                       class="score-input" 
+                                       value="<?php echo $student['last_ayah']; ?>" 
+                                       min="1" 
+                                       <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>>
+                            </td>
+                            <td>
+                                <input type="number" name="score_<?php echo $student['id']; ?>" 
+                                       id="score_<?php echo $student['id']; ?>" 
+                                       class="score-input" 
+                                       min="0" max="20" 
+                                       value="0" 
+                                       <?php echo $isAbsent ? 'disabled class="disabled-input"' : ''; ?>>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
