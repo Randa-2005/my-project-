@@ -220,5 +220,6 @@ $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
             openBtn.style.display = 'none';
         };
     </script>
+    
 </body>
 </html>
