@@ -1,0 +1,686 @@
+/* مدرسة أسرتي - التنسيق الموحد والمنظم */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+:root {
+    --main-green: #0d3c1a;
+    --gold: #b89548;
+    --soft-gold: #dfc99a;
+    --white: #ffffff;
+    --bg-gray: #f4f7f5;
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+
+body {
+    background-color: var(--bg-gray);
+    margin: 0;
+    direction: rtl;
+    display: flex;
+}
+
+/* --- السايدبار (Sidebar) --- */
+.sidebar {
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    transition: all 0.4s ease;
+    z-index: 1000;
+    
+    /* اللون الأخضر الذي اخترناه */
+    background-color: #0d3c1a; 
+    
+    /* رابط لنقش إسلامي هندسي واضح جداً */
+    background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
+    
+    /* هذه الخاصية ضرورية جداً لدمج النقش مع الأخضر */
+    background-blend-mode: multiply; 
+    
+    /* لتكرار النقش بشكل صحيح */
+    background-repeat: repeat;
+    background-size: 100px; /* جربي تغيير هذا الرقم (200px أو 400px) حتى يظهر الحجم كما في الصورة */
+}
+/* الهيدر وتصحيح مشكلة الأيقونة */
+.sidebar-header {
+    position: relative;
+    text-align: center;
+    padding: 20px 10px 15px; /* تقليل المسافات */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.school-logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px; /* إلغاء الفراغ بين الأيقونة والنص */
+}
+
+.school-logo-icon {
+    font-size: 2rem !important;
+    color: white;
+    margin-bottom: 2px !important; /* تقريب الأيقونة من النص */
+}
+
+.sidebar-header h3 {
+    font-size: 1.1rem;
+    margin: 0 !important;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.close-sidebar-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    left: 15px; /* يظهر في جهة اليسار داخل القائمة */
+    top: 20px;
+    display: block;
+}
+ 
+
+.sidebar, .main-content {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;}
+/* الروابط والقائمة */
+.nav-links {
+    list-style: none;
+    padding: 15px 10px;
+    margin: 0;
+}
+
+.nav-links li {
+    padding: 10px 12px; /* تقليل البادينج الجانبي من 20 إلى 12 */
+    margin: 4px 8px;    /* تقليل المارجن الجانبي من 12 إلى 8 */
+    display: flex;
+    align-items: center;
+    gap: 10px;         /* تقليل الفجوة بين الأيقونة والنص قليلاً */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* منع النص من النزول لسطر جديد نهائياً */
+    overflow: hidden;    /* ضمان عدم خروج النص عن الإطار */
+    font-size: 0.95rem;  /* تصغير الخط بنسبة بسيطة جداً ليناسب المساحة */
+}
+
+.nav-links li i {
+    margin-left: 12px;
+    width: 20px;
+    text-align: center;
+}
+
+/* 1. تنسيق الصفحة النشطة (ذهبي كامل ومطفي) */
+.nav-links li.active-gold {
+    background-color: #b89548 !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* التأكد من بقاء أيقونة الصفحة النشطة بيضاء */
+.nav-links li.active-gold i {
+    color: #ffffff !important;
+}
+
+/* 2. تأثير "الذهبي الشفاف" عند مرور الماوس (Hover) */
+.nav-links li:not(.active-gold):hover {
+    background-color: rgba(212, 160, 23, 0.2) !important; /* ذهبي شفاف */
+    border: 1px solid rgba(212, 160, 23, 0.4) !important; /* إطار ذهبي رقيق */
+    color: #ffffff !important; /* يبقى النص أبيض */
+    transform: translateX(-5px); /* حركة انزلاق خفيفة */
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+/* تأكد من أن الأيقونة تتبع اللون الأبيض عند الـ Hover */
+.nav-links li:not(.active-gold):hover {
+    background-color: rgba(212, 160, 23, 0.2) !important;
+    border: 1px solid rgba(212, 160, 23, 0.4) !important;
+    color: #ffffff !important;
+    transform: translateX(-3px); /* تقليل الإزاحة لكي لا يختفي النص */
+}
+
+.nav-links li {
+    padding: 10px 12px;
+    margin: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    
+    /* تحديد اللون الأبيض هنا يمنعه من التحول للأسود */
+    color: #ffffff !important; 
+}
+
+/* --- المحتوى الرئيسي --- */
+.main-content {
+    flex: 1;
+    margin-right: 260px;
+    padding: 30px;
+    transition: var(--transition);
+}
+
+
+/* 1. السايدبار والحركة */
+.sidebar {
+    transition: transform 0.4s ease-in-out !important;
+}
+
+.sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important ;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: translateX(100%) !important;
+    opacity: 0;
+    visibility: hidden;
+    overflow: visible !important;
+}
+
+/* الزر عندما يختفي السايدبار ويظهر في زاوية الشاشة */
+.sidebar.collapsed .close-sidebar-btn {
+    position: fixed !important;
+    right: 15px !important; /* تأكدي من المسافة من اليمين */
+    top: 15px !important;
+    z-index: 999999 !important; /* ليكون فوق كل محتوى الصفحة */
+    background-color: #1b5e20 !important; /* اللون الأخضر للمدرسة */
+    color: #ffffff !important; /* لون الأيقونة أبيض ناصع لكي تظهر */
+    width: 45px !important;
+    height: 45px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; /* إضافة ظل ليبرز عن الخلفية البيضاء */
+    visibility: visible !important; /* إجبار الزر على الظهور */
+    opacity: 1 !important;
+}
+
+/* إجبار الأيقونة داخل الزر على الظهور باللون الأبيض */
+.sidebar.collapsed .close-sidebar-btn i {
+    color: #1b5e20 !important;
+    font-size: 20px !important;
+}
+.main-content.expanded {
+    margin-right: 0 !important;
+    width: 100% !important;}
+/* تنسيق سجل الحفظ */
+.progress-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+}
+
+.progress-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.progress-table th {
+    background-color: var(--bg-gray);
+    color: var(--main-green);
+    padding: 12px;
+    text-align: right;
+    border-bottom: 2px solid var(--gold);
+}
+
+.progress-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.status-completed { background: #e8f5e9; color: #2e7d32; } /* ممتاز/تم */
+.status-pending { background: #fff3e0; color: #ef6c00; }   /* يحتاج مراجعة */
+
+/* تنسيق البطاقات لتكون واضحة ومفهومة */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+    padding: 10;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px; /* مسافة بين الأيقونة والكتابة */
+    box-shadow: var(--shadow);
+    border-right: 5px solid var(--gold); /* خط جانبي لتمييز البطاقة */
+}
+
+.stat-card.green-border {
+    border-right-color: var(--main-green);
+}
+
+.stat-info p {
+    margin: 0;
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.stat-info h3 {
+    margin: 5px 0 0;
+    color: var(--main-green);
+    font-size: 1.4rem;
+}
+
+.stat-icon {
+    width: 55px;
+    height: 55px;
+    background: #fdfaf3;
+    color: var(--gold);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* --- تنسيق الواجهة المنبثقة (Modal) النظيف --- */
+.custom-modal {
+    display: none; /* مخفي افتراضياً */
+    position: fixed;
+    z-index: 9999 !important; /* لضمان الظهور فوق كل شيء */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* خلفية داكنة شفافة */
+    backdrop-filter: blur(5px); /* ضبابية للخلفية */
+    align-items: center;
+    justify-content: center;
+}
+
+/* الكلاس الذي يتم تفعيله بالجافاسكريبت لإظهار الواجهة */
+.custom-modal.active {
+    display: flex !important;
+}
+
+.modal-content.style-premium {
+    background: #fff;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: fadeInScale 0.3s ease-out;
+}
+
+/* تنسيق رأس الواجهة */
+.modal-header-premium {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    color: #ffd700;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #ffd700;
+}
+
+.modal-title { margin: 0; font-size: 1.4rem; font-weight: bold; }
+
+.close-modal {
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.close-modal:hover { color: #ffd700; transform: rotate(90deg); }
+
+/* تنسيق جسم الواجهة والسور */
+.modal-body-scrollable {
+    padding: 25px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.surahs-grid-new {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.surah-item {
+    padding: 15px;
+    text-align: center;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    border: 1px solid #eee;
+    transition: 0.3s;
+}
+
+/* ألوان الحالات (باهية) */
+.surah-item.saved { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+.surah-item.current { 
+    background: #fff3e0; color: #ef6c00; border-color: #ffe0b2;
+    box-shadow: 0 0 10px rgba(239,108,0,0.2);
+}
+.surah-item.remaining { background: #f5f5f5; color: #9e9e9e; }
+
+/* أنيميشن الظهور */
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* دليل الألوان */
+.status-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.legend-item { font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.dot.green { background: #2e7d32; }
+.dot.orange { background: #ef6c00; }
+.dot.gray { background: #9e9e9e; }
+
+
+/* هذا هو التنسيق الذي سيجعل شكل اليد يظهر */
+.clickable-card {
+    cursor: pointer !important; /* يجعل المؤشر يظهر كيد عند التمرير */
+    transition: transform 0.2s ease, background-color 0.2s ease; /* إضافة حركة خفيفة */
+}
+
+/* حركة إضافية اختيارية لجعلها تبدو أكثر تفاعلية عند وضع الفأرة عليها */
+.clickable-card:hover {
+    background-color: #f9f9f9; /* تغيير خفيف في لون الخلفية */
+    transform: translateY(-3px); /* رفع البطاقة قليلاً للأعلى */
+}
+
+/* تنسيق حاوية الجدول */
+.table-container {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-top: 30px;
+}
+
+.table-header-main h3 {
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* تنسيق الجدول الحديث */
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: right; /* للمحاذاة العربية */
+}
+
+.modern-table thead tr {
+    background-color: #f8f9fa;
+    color: #777;
+}
+
+.modern-table th, .modern-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modern-table tbody tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* تنسيق شارة التقييم (ممتاز) */
+.rank-badge.excellent {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 5px 15px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+/* تنسيق شبكة الصفحة الجديدة */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr; /* الجدول أكبر من الملاحظات الجانبية */
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* بطاقة الملاحظات الجانبية */
+.info-card-side {
+    background: #fff9e6; /* لون ذهبي باهت جداً */
+    border-right: 4px solid #d4af37;
+    padding: 20px;
+    border-radius: 15px;
+    height: fit-content;
+}
+
+.info-card-side h4 { color: #d4af37; margin-bottom: 10px; }
+.info-card-side ul { padding-right: 20px; list-style-type: circle; }
+.info-card-side li { margin-bottom: 10px; font-size: 0.9rem; color: #555; }
+
+/* حالة الحلقة (نشط) */
+.status-on {
+    color: #2e7d32;
+    background: #e8f5e9;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* لجعل الجدول متجاوباً في الصفحة الجديدة */
+@media (max-width: 992px) {
+    .schedule-grid { grid-template-columns: 1fr; }
+}
+
+/* تنسيق الفترة الصباحية (أخضر فاتح جداً) */
+.period-tag.morning-green {
+    background-color: #e8f5e9; /* أخضر باهت مريح */
+    color: #2e7d32; /* كتابة خضراء غامقة للوضوح */
+    padding: 6px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* تنسيق الفترة المسائية (ذهبي فاتح) */
+.period-tag.evening-gold {
+    background-color: #fffde7; /* أصفر/ذهبي فاتح جداً */
+    color: #f9a825; /* لون ذهبي داكن للخط */
+    padding: 6px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    border: 1px solid #fff59d; /* إطار خفيف لزيادة الجمالية */
+}
+
+/* تحسين شكل أسطر الجدول */
+.modern-table tbody tr td {
+    color: #444;
+    font-size: 0.95rem;
+    padding: 18px 20px;
+}
+
+/* حاوية الملف الشخصي */
+/* التصميم العام لصندوق التنبيه */
+.payment-alert-box {
+    margin: 20px 0;
+    padding: 15px 25px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between; /* لتوزيع النص على الطرفين */
+    align-items: center;
+    border-right: 6px solid; /* الإطار الجانبي السميك */
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* الألوان حسب الحالة التي طلبتِها */
+.payment-alert-box.success { 
+    background-color: #e8f5e9; /* أخضر فاتح جداً */
+    color: #2e7d32; 
+    border-color: #4caf50; 
+}
+
+.payment-alert-box.warning { 
+    background-color: #fff3e0; /* برتقالي/ذهبي فاتح */
+    color: #e65100; 
+    border-color: #ff9800; 
+}
+
+.payment-alert-box.danger { 
+    background-color: #ffebee; /* أحمر فاتح */
+    color: #c62828; 
+    border-color: #f44336; 
+}
+
+/* تنسيق الأيقونات داخل التنبيه */
+.payment-alert-box i {
+    margin-left: 10px;
+    font-size: 1.1rem;
+}
+
+/* للموبايل: جعل النص فوق بعضه */
+@media (max-width: 600px) {
+    .payment-alert-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+
+/* التنسيق الجديد ليتناسب مع الصورة المطلوبة */
+.fixed-toggle-btn {
+    position: fixed !important;
+    right: 20px !important; /* مسافة متناسقة من اليمين */
+    top: 5px !important;
+    z-index: 99999 !important;
+    background-color: var(--main-green) !important; /* اللون الأخضر الغامق المعتمد */
+    color: #ffffff !important; /* لون الأيقونة أبيض ناصع */
+    border: 2px solid #ffffff !important; /* إطار أبيض خفيف ليبرز مثل الصورة */
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 10px !important; /* زوايا منحنية بشكل أنيق */
+    cursor: pointer;
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; /* ظل أقوى ليعطي تأثيراً عائماً */
+    transition: all 0.3s ease;
+}
+
+/* تأثير عند تمرير الماوس (Hover) */
+.fixed-toggle-btn:hover {
+    background-color: var(--gold) !important; /* لون أخضر أفتح قليلاً عند اللمس */
+    transform: scale(1.05); /* تكبير بسيط جداً */
+}
+
+/* حجم الأيقونة داخل الزر */
+.fixed-toggle-btn i {
+    font-size: 20px !important;
+}
+
+/* يظهر فقط عندما يتم إغلاق السايدبار */
+.sidebar.collapsed + .fixed-toggle-btn, 
+body:has(.sidebar.collapsed) .fixed-toggle-btn {
+    display: flex !important;
+}
+
+/* إخفاء الزر القديم تماماً عند الإغلاق لمنع التداخل */
+.sidebar.collapsed .close-sidebar-btn {
+    display: none !important;
+}
+
+/* تنسيق الأيقونة التي تنبض */
+.pulse-icon {
+
+    animation: alert-pulse 1.5s infinite;
+}
+
+@keyframes alert-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* اختياري: إذا أردتِ جعل خلفية السطر حمراء خفيفة عند الخطر */
+
+/* تنسيق الأيقونة الذهبية لتكون واضحة وفخمة */
+.header-icon-gold {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* ظل خفيف لإبراز الأيقونة */
+}
+
+/* تنسيق النص الذهبي */
+.header-text-gold {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* ظل خفيف للنص ليكون أوضح فوق النقش */
+    letter-spacing: 1px; /* مسافة بسيطة بين الحروف لتعطي فخامة */
+}
+/* تنسيق إضافي للهيدر العربي */
+.sidebar-header h3 {
+    letter-spacing: 0px; /* في العربية لا نحتاج لمسافات بين الحروف */
+    line-height: 1.5;
+}
+
+/* ضمان بقاء زر السهم قابلاً للنقر */
+#toggleIcon, .fixed-toggle-btn {
+    z-index: 9999 !important; /* رفعه لأعلى طبقة ممكنة */
+    pointer-events: auto !important; /* التأكد من استقباله للنقرات */
+    cursor: pointer;
+}
+
+/* منع الهيدر من تغطية مساحة السهم */
+.sidebar-header {
+    pointer-events: none; /* يجعل الهيدر شفافاً للنقرات فلا يعيق ما خلفه */
+}
+
+.sidebar-header i, .sidebar-header h3 {
+    pointer-events: auto; /* إعادة التفاعل للنصوص والأيقونة داخل الهيدر فقط */
+}
+#close-sidebar.close-sidebar-btn {
+    position: absolute;
+    top: 15px; /* المسافة من الأعلى */
+    left: 15px; /* المسافة من اليمين - تأكدي أنها right */
+    width: 35px; /* تحديد عرض الزر */
+    height: 35px; /* تحديد طول الزر */
+    display: flex; /* ليتوسط السهم داخل الزر */
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(191, 161, 95, 0.1) !important; /* خلفية خفيفة جداً لتري مكان الضغط */
+    border-radius: 50% !important; /* جعل منطقة الضغط دائرية */
+    border: none !important;
+    color: #bfa15f !important; /* لون السهم الذهبي */
+    cursor: pointer;
+    z-index: 9999; /* ليكون فوق كل النقوش والخلفيات */
+    padding: 0 !important;
+}
+
+/* لضمان أن السهم لا يتحرك من مكانه داخل الزر */
+#close-sidebar.close-sidebar-btn i {
+    font-size: 18px;
+    pointer-events: none; /* لكي لا تعيق الأيقونة عملية الضغط على الزر */
+}
+/* تنسيق الإطار الذهبي الشفاف المكثف للصفحة النشطة */
