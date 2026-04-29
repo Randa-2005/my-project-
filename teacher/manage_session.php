@@ -330,12 +330,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_exam'])) {
                     <tr class="exam-row" data-id="<?php echo $student['id']; ?>" data-absent="<?php echo $isAbsent ? '1' : '0'; ?>">
                         <td><?php echo htmlspecialchars($student['full_name']); ?></td>
                         <?php if ($isAbsent): ?>
-                            <td colspan="4" style="color:#c62828;">🚫 غائب<\/td>
+                            <td colspan="4" style="color:#c62828;">🚫 غائب</td>
                         <?php else: ?>
-                            <td class="stars hifz"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
-                            <td class="stars ahkam"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
-                            <td class="stars makh"><?php for($i=1;$i<=4;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?><\/td>
-                            <td class="total">0 / 20<\/td>
+                            <td class="stars hifz"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
+                            <td class="stars ahkam"><?php for($i=1;$i<=8;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
+                            <td class="stars makh"><?php for($i=1;$i<=4;$i++) echo "<i class='fas fa-star' data-val='$i'></i>"; ?></td>
+                            <td class="total">0 / 20</td>
                         <?php endif; ?>
                     </td>
                     <?php endforeach; ?>
